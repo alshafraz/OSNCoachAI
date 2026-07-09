@@ -1,0 +1,168 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-heading: var(--font-outfit), ui-sans-serif, system-ui;
+  
+  /* Semantic Colors mapping */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Learning Colors mapping */
+  --color-easy: var(--easy);
+  --color-medium: var(--medium);
+  --color-hard: var(--hard);
+  --color-olympiad: var(--olympiad);
+  --color-challenge: var(--challenge);
+  --color-xp: var(--xp);
+  --color-achievement: var(--achievement);
+  --color-ai-coach: var(--ai-coach);
+  --color-review: var(--review);
+  --color-locked: var(--locked);
+  --color-completed: var(--completed);
+
+  /* Playful Borders, Shadows, and Elevation */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  
+  --shadow-play: 0 4px 0 0 var(--border);
+  --shadow-play-hover: 0 6px 0 0 var(--border);
+  --shadow-play-active: 0 0px 0 0 var(--border);
+  --shadow-elevation-1: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.03);
+  --shadow-elevation-2: 0 12px 20px -8px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+}
+
+:root {
+  --background: oklch(0.99 0.005 240);
+  --foreground: oklch(0.15 0.02 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 240);
+  --primary: oklch(0.50 0.20 260); 
+  --primary-foreground: oklch(0.99 0.005 240);
+  --secondary: oklch(0.96 0.01 240);
+  --secondary-foreground: oklch(0.20 0.15 260);
+  --muted: oklch(0.96 0.01 240);
+  --muted-foreground: oklch(0.50 0.02 240);
+  --accent: oklch(0.77 0.188 70.08); 
+  --accent-foreground: oklch(0.15 0.02 240);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.01 240);
+  --input: oklch(0.92 0.01 240);
+  --ring: oklch(0.50 0.20 260 / 30%);
+  --radius: 1.25rem; 
+
+  /* Learning Colors light values */
+  --easy: oklch(0.68 0.18 140);        /* Emerald Green */
+  --medium: oklch(0.72 0.18 70);       /* Amber Orange */
+  --hard: oklch(0.58 0.20 25);         /* Rose Red */
+  --olympiad: oklch(0.50 0.20 280);     /* Deep Violet */
+  --challenge: oklch(0.62 0.18 50);    /* Golden Yellow */
+  --xp: oklch(0.62 0.16 220);          /* Ocean Cyan */
+  --achievement: oklch(0.75 0.18 80);   /* Medal Gold */
+  --ai-coach: oklch(0.55 0.18 290);     /* Magical Purple */
+  --review: oklch(0.65 0.15 40);       /* Warning Orange */
+  --locked: oklch(0.75 0.01 240);      /* Disabled Gray */
+  --completed: oklch(0.68 0.18 140);   /* Completed Green */
+
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.15 0.02 240);
+  --sidebar-primary: oklch(0.50 0.20 260);
+  --sidebar-primary-foreground: oklch(0.99 0.005 240);
+  --sidebar-accent: oklch(0.96 0.01 240);
+  --sidebar-accent-foreground: oklch(0.50 0.20 260);
+  --sidebar-border: oklch(0.92 0.01 240);
+  --sidebar-ring: oklch(0.50 0.20 260 / 20%);
+}
+
+.dark {
+  --background: oklch(0.12 0.015 240);
+  --foreground: oklch(0.98 0.005 240);
+  --card: oklch(0.15 0.015 240);
+  --card-foreground: oklch(0.98 0.005 240);
+  --popover: oklch(0.15 0.015 240);
+  --popover-foreground: oklch(0.98 0.005 240);
+  --primary: oklch(0.65 0.18 260); 
+  --primary-foreground: oklch(0.12 0.015 240);
+  --secondary: oklch(0.22 0.02 240);
+  --secondary-foreground: oklch(0.98 0.005 240);
+  --muted: oklch(0.22 0.02 240);
+  --muted-foreground: oklch(0.70 0.01 240);
+  --accent: oklch(0.75 0.18 70.08);
+  --accent-foreground: oklch(0.12 0.015 240);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.25 0.02 240);
+  --input: oklch(0.25 0.02 240);
+  --ring: oklch(0.65 0.18 260 / 30%);
+
+  /* Learning Colors dark values */
+  --easy: oklch(0.72 0.15 140);
+  --medium: oklch(0.75 0.15 70);
+  --hard: oklch(0.65 0.18 25);
+  --olympiad: oklch(0.60 0.18 280);
+  --challenge: oklch(0.68 0.15 50);
+  --xp: oklch(0.68 0.14 220);
+  --achievement: oklch(0.78 0.15 80);
+  --ai-coach: oklch(0.62 0.16 290);
+  --review: oklch(0.70 0.14 40);
+  --locked: oklch(0.35 0.01 240);
+  --completed: oklch(0.72 0.15 140);
+
+  --sidebar: oklch(0.14 0.015 240);
+  --sidebar-foreground: oklch(0.98 0.005 240);
+  --sidebar-primary: oklch(0.65 0.18 260);
+  --sidebar-primary-foreground: oklch(0.14 0.015 240);
+  --sidebar-accent: oklch(0.20 0.02 240);
+  --sidebar-accent-foreground: oklch(0.98 0.005 240);
+  --sidebar-border: oklch(0.22 0.02 240);
+  --sidebar-ring: oklch(0.65 0.18 260 / 20%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-200;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight font-extrabold;
+  }
+  html {
+    @apply font-sans antialiased;
+  }
+}

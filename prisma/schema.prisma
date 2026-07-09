@@ -1,0 +1,223 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  PARENT
+  STUDENT
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  passwordHash  String
+  role          Role            @default(STUDENT)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  // Relations
+  studentProfile StudentProfile? @relation("UserToProfile")
+  parentProfile  StudentProfile[] @relation("ParentToStudent")
+}
+
+model StudentProfile {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  parentId       String?
+  points         Int       @default(0)
+  level          Int       @default(1)
+  currentStreak  Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  user           User      @relation("UserToProfile", fields: [userId], references: [id], onDelete: Cascade)
+  parent         User?     @relation("ParentToStudent", fields: [parentId], references: [id])
+  attempts       Attempt[]
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  SHORT_ANSWER
+}
+
+model Question {
+  id             String       @id @default(cuid())
+  title          String
+  body           String
+  type           QuestionType @default(SHORT_ANSWER)
+  options        String[]
+  imageUrl       String?
+  difficulty     Difficulty   @default(MEDIUM)
+  topic          String
+  correctAnswer  String
+  explanation    String
+  hint           String?
+  source         String?
+  tags           String[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  attempts       Attempt[]
+}
+
+model Attempt {
+  id                 String         @id @default(cuid())
+  studentProfileId   String
+  questionId         String
+  studentAnswer      String
+  isCorrect          Boolean
+  coachConversation  Json?          // Stores conversation history with AI Coach
+  createdAt          DateTime       @default(now())
+
+  // Relations
+  studentProfile     StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  question           Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+// ─── CONTENT INTELLIGENCE PLATFORM ──────────────────────────────────────────
+
+enum CipContentStatus {
+  DRAFT
+  PROCESSING
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CipPipelineStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  PARTIAL
+  PAUSED
+}
+
+enum CipStageStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum CipReviewDecision {
+  APPROVED
+  REJECTED
+  EDIT_REQUESTED
+}
+
+model CipContentItem {
+  id                   String             @id @default(cuid())
+  sourceType           String
+  fileName             String?
+  fileSizeBytes        Int?
+  mimeType             String?
+  pageCount            Int?
+  fileHash             String?
+  rawContent           String?
+  uploadedBy           String
+  status               CipContentStatus   @default(DRAFT)
+  publishedQuestionIds String[]
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  // Relations
+  pipelineJobs         CipPipelineJob[]
+  versions             CipContentVersion[]
+  auditLog             CipAuditLogEntry[]
+}
+
+model CipPipelineJob {
+  id                String             @id @default(cuid())
+  contentItemId     String
+  status            CipPipelineStatus  @default(QUEUED)
+  currentStage      String?
+  totalLatencyMs    Int?
+  aiCostEstimate    Float?
+  errorCount        Int                @default(0)
+  extractedData     Json?              // ExtractedQuestion[]
+  confidenceScores  Json?
+  qualityScore      Json?
+  classificationData Json?
+  duplicateMatches  Json?
+  enrichment        Json?
+  startedAt         DateTime           @default(now())
+  completedAt       DateTime?
+
+  // Relations
+  contentItem       CipContentItem     @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  stages            CipPipelineStage[]
+  review            CipReviewRecord?
+}
+
+model CipPipelineStage {
+  id          String          @id @default(cuid())
+  jobId       String
+  stageName   String
+  status      CipStageStatus  @default(PENDING)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  latencyMs   Int?
+  retryCount  Int             @default(0)
+  output      Json?
+  errors      String[]
+  warnings    String[]
+
+  // Relations
+  job         CipPipelineJob  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model CipReviewRecord {
+  id              String              @id @default(cuid())
+  jobId           String              @unique
+  reviewerId      String
+  decision        CipReviewDecision
+  comments        String              @default("")
+  editedQuestions Json?
+  reviewedAt      DateTime            @default(now())
+
+  // Relations
+  job             CipPipelineJob      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model CipContentVersion {
+  id                String         @id @default(cuid())
+  contentItemId     String
+  version           Int
+  changedBy         String
+  changeDescription String
+  snapshot          Json
+  createdAt         DateTime       @default(now())
+
+  // Relations
+  contentItem       CipContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+}
+
+model CipAuditLogEntry {
+  id            String         @id @default(cuid())
+  contentItemId String
+  action        String
+  actor         String
+  metadata      Json
+  timestamp     DateTime       @default(now())
+
+  // Relations
+  contentItem   CipContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+}
+

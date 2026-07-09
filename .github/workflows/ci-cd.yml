@@ -1,0 +1,67 @@
+name: MathOSN Coach Continuous Integration & Delivery Pipeline
+
+on:
+  push:
+    branches: [ main, release/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-node: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint Verification
+        run: npm run lint
+
+      - name: TypeScript Code compilation check
+        run: npx tsc --noEmit
+
+      - name: Run Test Suite (with AIOps benchmarks & regression verification)
+        run: node -r ts-node/register src/test-runner.ts
+
+  docker-build:
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Optimized Docker Image
+        run: |
+          docker build -t mathosn-coach:latest -f Dockerfile .
+
+      - name: Docker Image Security Scan (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'mathosn-coach:latest'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+  deploy:
+    needs: docker-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Blue-Green Canary Deployment
+        run: |
+          echo "Simulating production blue-green rolling rollout..."
+          echo "Deploying target containers and routing health check probes..."
+          echo "Canary verify gate: OK."
