@@ -106,9 +106,10 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async updateStudentPointsAndStreak(profileId: string, points: number, currentStreak: number): Promise<StudentProfile> {
+    const level = Math.floor(points / 100) + 1;
     const dbProfile = await prisma.studentProfile.update({
       where: { id: profileId },
-      data: { points, currentStreak },
+      data: { points, currentStreak, level },
     });
     return new StudentProfile(
       dbProfile.id,

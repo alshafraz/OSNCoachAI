@@ -12,16 +12,16 @@ export class PrismaQuestionRepository implements QuestionRepository {
       dbQuestion.id,
       dbQuestion.title,
       dbQuestion.body,
-      dbQuestion.difficulty,
+      dbQuestion.difficulty as any,
       dbQuestion.topic,
       dbQuestion.correctAnswer,
       dbQuestion.explanation,
-      dbQuestion.type,
-      dbQuestion.options,
+      dbQuestion.type as any,
+      dbQuestion.options ? JSON.parse(dbQuestion.options) : [],
       dbQuestion.imageUrl || undefined,
       dbQuestion.hint || undefined,
       dbQuestion.source || undefined,
-      dbQuestion.tags,
+      dbQuestion.tags ? JSON.parse(dbQuestion.tags) : [],
       dbQuestion.createdAt,
       dbQuestion.updatedAt
     );
@@ -35,16 +35,16 @@ export class PrismaQuestionRepository implements QuestionRepository {
           dbQuestion.id,
           dbQuestion.title,
           dbQuestion.body,
-          dbQuestion.difficulty,
+          dbQuestion.difficulty as any,
           dbQuestion.topic,
           dbQuestion.correctAnswer,
           dbQuestion.explanation,
-          dbQuestion.type,
-          dbQuestion.options,
+          dbQuestion.type as any,
+          dbQuestion.options ? JSON.parse(dbQuestion.options) : [],
           dbQuestion.imageUrl || undefined,
           dbQuestion.hint || undefined,
           dbQuestion.source || undefined,
-          dbQuestion.tags,
+          dbQuestion.tags ? JSON.parse(dbQuestion.tags) : [],
           dbQuestion.createdAt,
           dbQuestion.updatedAt
         )
@@ -64,8 +64,8 @@ export class PrismaQuestionRepository implements QuestionRepository {
     const where: any = {};
     if (options.search) {
       where.OR = [
-        { title: { contains: options.search, mode: 'insensitive' } },
-        { body: { contains: options.search, mode: 'insensitive' } },
+        { title: { contains: options.search } },
+        { body: { contains: options.search } },
       ];
     }
     if (options.topic) {
@@ -75,7 +75,7 @@ export class PrismaQuestionRepository implements QuestionRepository {
       where.difficulty = options.difficulty;
     }
     if (options.source) {
-      where.source = { contains: options.source, mode: 'insensitive' };
+      where.source = { contains: options.source };
     }
 
     const [dbQuestions, total] = await Promise.all([
@@ -94,16 +94,16 @@ export class PrismaQuestionRepository implements QuestionRepository {
           dbQuestion.id,
           dbQuestion.title,
           dbQuestion.body,
-          dbQuestion.difficulty,
+          dbQuestion.difficulty as any,
           dbQuestion.topic,
           dbQuestion.correctAnswer,
           dbQuestion.explanation,
-          dbQuestion.type,
-          dbQuestion.options,
+          dbQuestion.type as any,
+          dbQuestion.options ? JSON.parse(dbQuestion.options) : [],
           dbQuestion.imageUrl || undefined,
           dbQuestion.hint || undefined,
           dbQuestion.source || undefined,
-          dbQuestion.tags,
+          dbQuestion.tags ? JSON.parse(dbQuestion.tags) : [],
           dbQuestion.createdAt,
           dbQuestion.updatedAt
         )
@@ -118,7 +118,7 @@ export class PrismaQuestionRepository implements QuestionRepository {
         title: question.title,
         body: question.body,
         type: question.type,
-        options: question.options,
+        options: JSON.stringify(question.options || []),
         imageUrl: question.imageUrl || undefined,
         difficulty: question.difficulty,
         topic: question.topic,
@@ -126,23 +126,23 @@ export class PrismaQuestionRepository implements QuestionRepository {
         explanation: question.explanation,
         hint: question.hint || undefined,
         source: question.source || undefined,
-        tags: question.tags,
+        tags: JSON.stringify(question.tags || []),
       },
     });
     return new Question(
       dbQuestion.id,
       dbQuestion.title,
       dbQuestion.body,
-      dbQuestion.difficulty,
+      dbQuestion.difficulty as any,
       dbQuestion.topic,
       dbQuestion.correctAnswer,
       dbQuestion.explanation,
-      dbQuestion.type,
-      dbQuestion.options,
+      dbQuestion.type as any,
+      dbQuestion.options ? JSON.parse(dbQuestion.options) : [],
       dbQuestion.imageUrl || undefined,
       dbQuestion.hint || undefined,
       dbQuestion.source || undefined,
-      dbQuestion.tags,
+      dbQuestion.tags ? JSON.parse(dbQuestion.tags) : [],
       dbQuestion.createdAt,
       dbQuestion.updatedAt
     );
@@ -155,7 +155,7 @@ export class PrismaQuestionRepository implements QuestionRepository {
         title: question.title,
         body: question.body,
         type: question.type,
-        options: question.options,
+        options: question.options ? JSON.stringify(question.options) : undefined,
         imageUrl: question.imageUrl,
         difficulty: question.difficulty,
         topic: question.topic,
@@ -163,23 +163,23 @@ export class PrismaQuestionRepository implements QuestionRepository {
         explanation: question.explanation,
         hint: question.hint,
         source: question.source,
-        tags: question.tags,
+        tags: question.tags ? JSON.stringify(question.tags) : undefined,
       },
     });
     return new Question(
       dbQuestion.id,
       dbQuestion.title,
       dbQuestion.body,
-      dbQuestion.difficulty,
+      dbQuestion.difficulty as any,
       dbQuestion.topic,
       dbQuestion.correctAnswer,
       dbQuestion.explanation,
-      dbQuestion.type,
-      dbQuestion.options,
+      dbQuestion.type as any,
+      dbQuestion.options ? JSON.parse(dbQuestion.options) : [],
       dbQuestion.imageUrl || undefined,
       dbQuestion.hint || undefined,
       dbQuestion.source || undefined,
-      dbQuestion.tags,
+      dbQuestion.tags ? JSON.parse(dbQuestion.tags) : [],
       dbQuestion.createdAt,
       dbQuestion.updatedAt
     );

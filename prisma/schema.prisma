@@ -1,20 +1,9 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-enum Role {
-  PARENT
-  STUDENT
-}
-
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
 }
 
 model User {
@@ -22,7 +11,7 @@ model User {
   name          String?
   email         String          @unique
   passwordHash  String
-  role          Role            @default(STUDENT)
+  role          String          @default("STUDENT")
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   
@@ -47,25 +36,20 @@ model StudentProfile {
   attempts       Attempt[]
 }
 
-enum QuestionType {
-  MULTIPLE_CHOICE
-  SHORT_ANSWER
-}
-
 model Question {
   id             String       @id @default(cuid())
   title          String
   body           String
-  type           QuestionType @default(SHORT_ANSWER)
-  options        String[]
+  type           String       @default("SHORT_ANSWER")
+  options        String
   imageUrl       String?
-  difficulty     Difficulty   @default(MEDIUM)
+  difficulty     String       @default("MEDIUM")
   topic          String
   correctAnswer  String
   explanation    String
   hint           String?
   source         String?
-  tags           String[]
+  tags           String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -89,39 +73,6 @@ model Attempt {
 
 // ─── CONTENT INTELLIGENCE PLATFORM ──────────────────────────────────────────
 
-enum CipContentStatus {
-  DRAFT
-  PROCESSING
-  PENDING_REVIEW
-  APPROVED
-  REJECTED
-  PUBLISHED
-  ARCHIVED
-}
-
-enum CipPipelineStatus {
-  QUEUED
-  RUNNING
-  COMPLETED
-  FAILED
-  PARTIAL
-  PAUSED
-}
-
-enum CipStageStatus {
-  PENDING
-  RUNNING
-  COMPLETED
-  FAILED
-  SKIPPED
-}
-
-enum CipReviewDecision {
-  APPROVED
-  REJECTED
-  EDIT_REQUESTED
-}
-
 model CipContentItem {
   id                   String             @id @default(cuid())
   sourceType           String
@@ -132,8 +83,8 @@ model CipContentItem {
   fileHash             String?
   rawContent           String?
   uploadedBy           String
-  status               CipContentStatus   @default(DRAFT)
-  publishedQuestionIds String[]
+  status               String             @default("DRAFT")
+  publishedQuestionIds String
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
@@ -146,7 +97,7 @@ model CipContentItem {
 model CipPipelineJob {
   id                String             @id @default(cuid())
   contentItemId     String
-  status            CipPipelineStatus  @default(QUEUED)
+  status            String             @default("QUEUED")
   currentStage      String?
   totalLatencyMs    Int?
   aiCostEstimate    Float?
@@ -170,14 +121,14 @@ model CipPipelineStage {
   id          String          @id @default(cuid())
   jobId       String
   stageName   String
-  status      CipStageStatus  @default(PENDING)
+  status      String          @default("PENDING")
   startedAt   DateTime        @default(now())
   completedAt DateTime?
   latencyMs   Int?
   retryCount  Int             @default(0)
   output      Json?
-  errors      String[]
-  warnings    String[]
+  errors      String
+  warnings    String
 
   // Relations
   job         CipPipelineJob  @relation(fields: [jobId], references: [id], onDelete: Cascade)
@@ -187,7 +138,7 @@ model CipReviewRecord {
   id              String              @id @default(cuid())
   jobId           String              @unique
   reviewerId      String
-  decision        CipReviewDecision
+  decision        String
   comments        String              @default("")
   editedQuestions Json?
   reviewedAt      DateTime            @default(now())

@@ -3,9 +3,9 @@ import { defineConfig } from "prisma/config";
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    url: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/mathosn",
+    url: process.env.DATABASE_URL || "file:./dev.db",
   },
   migrations: {
-    seed: "node prisma/seed.js",
+    seed: "node prisma/seed.cjs",
   },
 });
