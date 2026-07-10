@@ -69,7 +69,7 @@ export async function getNextQuestionAction(): Promise<ApiResponse> {
       if (questions.length > 0) {
         // Return a random question from list to practice
         const randomIndex = Math.floor(Math.random() * questions.length);
-        return successResponse(questions[randomIndex]);
+        return successResponse(JSON.parse(JSON.stringify(questions[randomIndex])));
       }
     } catch (e) {
       // Database connection error or missing table
@@ -114,7 +114,7 @@ export async function createQuestionAction(formData: {
     }
 
     const question = await createQuestionUseCase.execute(formData);
-    return successResponse(question);
+    return successResponse(JSON.parse(JSON.stringify(question)));
   } catch (error: any) {
     console.error('Create question action error:', error);
     return errorResponse('CREATE_FAILED', error.message || 'Failed to create question.');
@@ -145,7 +145,7 @@ export async function updateQuestionAction(
     }
 
     const question = await updateQuestionUseCase.execute({ id, data: formData });
-    return successResponse(question);
+    return successResponse(JSON.parse(JSON.stringify(question)));
   } catch (error: any) {
     console.error('Update question action error:', error);
     return errorResponse('UPDATE_FAILED', error.message || 'Failed to update question.');
@@ -182,7 +182,7 @@ export async function getQuestionsListAction(filters: {
     }
 
     const result = await getQuestionsListUseCase.execute(filters);
-    return successResponse(result);
+    return successResponse(JSON.parse(JSON.stringify(result)));
   } catch (error: any) {
     console.error('Get questions list action error:', error);
     return errorResponse('GET_LIST_FAILED', error.message || 'Failed to fetch question bank.');

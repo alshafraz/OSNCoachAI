@@ -27,7 +27,7 @@ Orchestrates application use cases, defining the user stories and actions that d
 
 ### 3. Infrastructure Layer (`src/infrastructure/`)
 The adapter layer connecting core business logic to external databases, framework routes, and third-party APIs.
-- **Database Client (`db/prisma.ts`)**: Prisma ORM connection config.
+- **Database Client (`db/prisma.ts`)**: Prisma ORM connection config (using `@prisma/adapter-better-sqlite3` driver).
 - **Repositories (`repositories/`)**: Concrete implementations of domain repositories using Prisma (e.g., `PrismaUserRepository`).
 - **Services (`services/`)**: Implementations of external engines (e.g., Socratic prompts in `OpenAiCoachService` and upload logic in `SupabaseStorageService`).
 - **DI Container (`config/container.ts`)**: The dependency injection container wiring concrete repositories and services into the use cases.
@@ -35,7 +35,7 @@ The adapter layer connecting core business logic to external databases, framewor
 ### 4. Presentation Layer (`src/presentation/` & `src/app/`)
 The Next.js framework layer delivering layouts, client pages, state hooks, and action handlers.
 - **App Router (`src/app/`)**: Standard App Router directory containing layout templates, page views, error boundaries, and loading screens.
-- **Actions (`actions/`)**: Next.js Server Actions acting as controllers that call application Use Cases.
+- **Actions (`actions/`)**: Next.js Server Actions acting as controllers that call application Use Cases. Output data is serialized into plain JavaScript objects to satisfy React Client Component serialization boundaries.
 - **Components (`components/`)**: Shared, student-specific, and parent-specific components styled with shadcn/ui.
 
 ---
@@ -44,7 +44,7 @@ The Next.js framework layer delivering layouts, client pages, state hooks, and a
 
 We employ modern web aesthetics with a playful, kid-friendly look (inspired by Duolingo & Khan Academy):
 - **Typography**: `Outfit` Google Font (headings) and `Inter` (body) loaded natively with Next.js font optimization.
-- **Color System**: Custom Tailwind CSS v4 variables configured in `globals.css` with dark mode support.
+- **Color System**: Custom Tailwind CSS variables configured in CSS with dark mode support.
   - **Indigo**: Brand accent and primary workspace colors.
   - **Amber**: Streak multipliers and Socratic tips.
   - **Emerald**: Successful answers and point rewards.
@@ -55,14 +55,14 @@ We employ modern web aesthetics with a playful, kid-friendly look (inspired by D
 ## Getting Started
 
 ### 1. Prerequisites
-- **Node.js** v18+
-- **PostgreSQL** instance
+- **Node.js** v20+
+- **SQLite** (automatically handled locally by `better-sqlite3`)
 
 ### 2. Environment Variables (`.env`)
 Create a `.env` file at the root:
 ```env
-# PostgreSQL connection URL
-DATABASE_URL="postgresql://username:password@localhost:5432/mathosn"
+# SQLite Database connection URL
+DATABASE_URL="file:./dev.db"
 
 # Auth.js secret key
 NEXTAUTH_SECRET="your-32-character-secret-key-goes-here"
@@ -80,12 +80,25 @@ SUPABASE_KEY="your-supabase-anon-key"
 # Install dependencies
 npm install
 
-# Initialize database schema
+# Initialize local SQLite database schema
 npx prisma db push
+
+# Seed database with sample parent/student sandbox accounts and questions
+npx prisma db seed
 
 # Launch local development server
 npm run dev
 ```
+
+---
+
+## Running Tests
+
+The workspace features standard unit tests alongside Prisma repository integration tests running on a dedicated test database:
+
+* **Mock Logic Tests**: `npm run test` (Runs 261 logic tests using memory mocks).
+* **Database Repository Tests**: `npm run test:db` (Runs integration tests for CRUD, level-ups, and JSON array persistence against `test.db`).
+* **Complete Test Suite**: `npm run test:all` (Sequentially runs both mock and database test blocks).
 
 ---
 
@@ -112,9 +125,6 @@ Learning Events → Aggregation → Metrics → Pattern Detection → Insight �
 ### LIP Quick Start
 
 ```bash
-# Run LIP database migrations (requires TypeORM data-source configured)
-npx typeorm migration:run -d src/infrastructure/db/dataSource.ts
-
 # Ingest a sample event (POST)
 curl -X POST http://localhost:3000/analytics/events \
   -H "Content-Type: application/json" \
